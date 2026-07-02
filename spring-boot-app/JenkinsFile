@@ -1,31 +1,39 @@
 pipeline {
-  agent {
-    docker {
-      image 'abhishekf5/maven-abhishek-docker-agent:v1'
-      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
+    agent {
+        docker {
+            image 'abhishekf5/maven-abhishek-docker-agent:v1'
+            args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
+        }
     }
-  }
-  stages {
-    stage('Checkout') {
-      steps {
-        
-        git branch: 'main', url: 'https://github.com/Syamlal-M/javaplication-cicd.git'
-      }
-    }
-   stage('Build and Test') {
-      steps {
-        sh 'ls -ltr'
-        // build the project and create a JAR file
-        sh 'cd spring-boot-app && mvn clean package'
-      }
-    }
-       stage('Build and Push Docker Image') {
-          environment {
-            DOCKER_IMAGE = "shyam1239/java:${BUILD_NUMBER}"
-            REGISTRY_CREDENTIALS = credentials('dockerhub-creds')
 
-      }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Syamlal-M/javaplication-cicd.git'
+            }
+        }
 
-}
-}
+        stage('Build and Test') {
+            steps {
+                sh 'ls -ltr'
+                sh 'cd spring-boot-app && mvn clean package'
+            }
+        }
+
+        stage('Build and Push Docker Image') {
+            environment {
+                DOCKER_IMAGE = "shyam1239/java:${BUILD_NUMBER}"
+                REGISTRY_CREDENTIALS = credentials('dockerhub-creds')
+            }
+
+            steps {
+                sh '''
+                    cd spring-boot-app
+                    docker build -t $DOCKER_IMAGE .
+                    echo $REGISTRY_CREDENTIALS_PSW | docker login -u $REGISTRY_CREDENTIALS_USR --password-stdin
+                    docker push $DOCKER_IMAGE
+                '''
+            }
+        }
+    }
 }
