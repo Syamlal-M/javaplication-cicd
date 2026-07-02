@@ -60,14 +60,17 @@ pipeline {
                     git config user.email "shyamlalsh@gmail.com"
                     git config user.name "syamlal-M"
                     BUILD_NUMBER=${BUILD_NUMBER}
-                    git fetch origin
-                    git reset --hard origin/main 
-                    sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" \
-                    spring-boot-app-manifest/deployment.yaml
+                     if [ ! -d javaplication-cicd ]; then
+                       git clone https://github.com/Syamlal-M/javaplication-cicd.git
+                     fi
 
-                    git add spring-boot-app-manifests/deployment.yml
-                    git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                    git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
+                     cd spring-boot-app-manifest
+                     git fetch origin
+                     git reset --hard origin/main
+                     sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yaml
+                     git add spring-boot-app-manifests/deployment.yml
+                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
+                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                   '''
             }
         }
