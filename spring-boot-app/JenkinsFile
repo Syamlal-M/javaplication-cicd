@@ -60,6 +60,7 @@ pipeline {
                     git config user.email "shyamlalsh@gmail.com"
                     git config user.name "syamlal-M"
                     BUILD_NUMBER=${BUILD_NUMBER}
+                    git clonehttps://github.com/Syamlal-M/javaplication-cicd.git
                     ls -ltr
                     cd spring-boot-app-manifest
                     ls -ltr
