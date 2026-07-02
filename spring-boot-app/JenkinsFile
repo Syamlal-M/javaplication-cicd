@@ -13,6 +13,16 @@ pipeline {
             }
         }
 
+       stage('Check Docker Version') {
+         steps {
+           sh '''
+           which docker
+           docker version
+           docker --version
+             '''
+    }
+}
+
         stage('Build and Test') {
             steps {
                 sh 'ls -ltr'
