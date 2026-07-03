@@ -60,13 +60,8 @@ pipeline {
                     git config user.email "shyamlalsh@gmail.com"
                     git config user.name "syamlal-M"
                     BUILD_NUMBER=${BUILD_NUMBER}
-                    pwd
-                    ls -ltr
-                    ls -ltr spring-boot-app-manifest 
 
                     cd spring-boot-app-manifest
-                    pwd
-                    ls -ltr
                     sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yml
                     git add deployment.yml
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
