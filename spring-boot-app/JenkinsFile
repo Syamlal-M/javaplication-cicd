@@ -58,7 +58,7 @@ pipeline {
             withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
                 sh '''
                     git config user.email "shyamlalsh@gmail.com"
-                    git config user.name "syamlal-M"
+                    git config user.name "Syamlal-M"
                     BUILD_NUMBER=${BUILD_NUMBER}
 
                     cd spring-boot-app-manifest
