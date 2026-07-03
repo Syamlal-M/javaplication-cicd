@@ -1,81 +1,51 @@
-pipeline {
-    agent {
-        docker {
-
-          image 'shyam1239/maven-docker-agent:v2'
-          args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
-        }
+stage('Update Deployment File') {
+    environment {
+        GIT_REPO_NAME = "javaplication-cicd"
+        GIT_USER_NAME = "Syamlal-M"
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/Syamlal-M/javaplication-cicd.git'
-            }
+    steps {
+        withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
+            sh '''
+                git config --global user.email "shyamlalsh@gmail.com"
+                git config --global user.name "syamlal-M"
+
+                echo "===== Current Workspace ====="
+                pwd
+                ls -ltr
+
+                echo "===== Searching for deployment files ====="
+                find . -name "*.yaml"
+                find . -name "*.yml"
+
+                BUILD_NUMBER=${BUILD_NUMBER}
+
+                if [ ! -d javaplication-cicd ]; then
+                    git clone https://github.com/Syamlal-M/javaplication-cicd.git
+                fi
+
+                cd javaplication-cicd
+
+                echo "===== Inside Repository ====="
+                pwd
+                ls -ltr
+
+                cd spring-boot-app-manifest
+
+                echo "===== Manifest Directory ====="
+                pwd
+                ls -ltr
+
+                git fetch origin
+                git reset --hard origin/main
+
+                sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yaml
+
+                git add deployment.yaml
+                git commit -m "Update deployment image to version ${BUILD_NUMBER}" || echo "Nothing to commit"
+
+                git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+            '''
         }
-   
-       stage('Check Docker Version') {
-        steps {
-         sh '''
-         which docker
-         docker version
-         docker --version
-         '''
     }
 }
-
-      stage('Build and Test') {
-       steps {
-       sh 'ls -ltr'
-        // build the project and create a JAR file
-        sh 'cd spring-boot-app && mvn clean package'
-      }
-    }
-      stage('Build and Push Docker Image') {
-       environment {
-        DOCKER_IMAGE = "shyam1239/ultimate-cicd:${BUILD_NUMBER}"
-        // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
-        REGISTRY_CREDENTIALS = credentials('8bf1d040-de4f-4f42-9755-4404bccd0220')
-      }
-       steps {
-        script {
-            sh 'cd spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
-            def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', "8bf1d040-de4f-4f42-9755-4404bccd0220") {
-                dockerImage.push()
-            }
-        }
-      }
-    }
-
-
-     stage('Update Deployment File') {
-        environment {
-            GIT_REPO_NAME = "javaplication-cicd"
-            GIT_USER_NAME = "syamlal-M"
-        }
-        steps {
-            withCredentials([string(credentialsId: 'github', variable: 'GITHUB_TOKEN')]) {
-                sh '''
-                    git config user.email "shyamlalsh@gmail.com"
-                    git config user.name "syamlal-M"
-                    BUILD_NUMBER=${BUILD_NUMBER}
-                     if [ ! -d javaplication-cicd ]; then
-                       git clone https://github.com/Syamlal-M/javaplication-cicd.git
-                     fi
-
-                     cd spring-boot-app-manifest
-                     git fetch origin
-                     git reset --hard origin/main
-                     sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yaml
-                     git add spring-boot-app-manifests/deployment.yml
-                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
-                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
-                  '''
-            }
-        }
-    }
-
-       }
-    }
-
