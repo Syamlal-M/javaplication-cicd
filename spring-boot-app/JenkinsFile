@@ -67,7 +67,7 @@ pipeline {
                     cd spring-boot-app-manifest
                     pwd
                     ls -ltr
-                    sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yaml
+                    sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yml
                     git add spring-boot-app-manifests/deployment.yml
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
