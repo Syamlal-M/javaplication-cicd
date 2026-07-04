@@ -68,6 +68,9 @@ pipeline {
                     BUILD_NUMBER=${BUILD_NUMBER}
                     cd spring-boot-app-manifest
                     helm upgrade --install spring-boot-app-manifest . --set image.tag=${BUILD_NUMBER}
+                    sed -i "s/tag:.*/tag: ${BUILD_NUMBER}/" values.yaml
+                    git add values.yaml
+                    git commit -m "Update image tag to ${BUILD_NUMBER}"
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                   '''
