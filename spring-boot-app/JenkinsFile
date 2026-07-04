@@ -60,10 +60,8 @@ pipeline {
                     git config user.email "shyamlalsh@gmail.com"
                     git config user.name "Syamlal-M"
                     BUILD_NUMBER=${BUILD_NUMBER}
-
                     cd spring-boot-app-manifest
-                    sed -i "s|image: shyam1239/ultimate-cicd:.*|image: shyam1239/ultimate-cicd:${BUILD_NUMBER}|g" deployment.yml
-                    git add deployment.yml
+                    helm upgrade --install myapp . --set image.tag=${BUILD_NUMBER}
                     git commit -m "Update deployment image to version ${BUILD_NUMBER}"
                     git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME} HEAD:main
                   '''
