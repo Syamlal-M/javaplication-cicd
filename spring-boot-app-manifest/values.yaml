@@ -1,0 +1,4 @@
+image:
+  repository: shyam1239/ultimate-cicd
+  tag: 27
+  pullPolicy: IfNotPresent
