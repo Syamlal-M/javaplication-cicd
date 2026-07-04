@@ -50,7 +50,13 @@ pipeline {
 
 
      stage('Update Deployment File') {
-        environment {
+      agent {
+       docker{
+        image 'alpine/helm:3.17.0'
+}
+}
+
+      environment {
             GIT_REPO_NAME = "javaplication-cicd"
             GIT_USER_NAME = "Syamlal-M"
         }
