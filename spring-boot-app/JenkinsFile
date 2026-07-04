@@ -52,7 +52,7 @@ pipeline {
      stage('Update Deployment File') {
       agent {
        docker{
-        image 'alpine/helm:3.17.0'
+        image 'shyam1239/helm-git:1.0'
 }
 }
 
